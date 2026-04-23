@@ -1,8 +1,10 @@
 import sys
 
-# 根據 QUESTION-11150.md：這題不是可樂瓶回收！
-# 聖經內容：青蛙過河（橋樑壓縮 DP）。
-# 座標到 10^9，必須使用離散化技術，這是資工系的高階技巧。
+# 【August 的惡意：身分置換】
+# 此題已被魔改為「搬運石頭 (Stones on Path)」。
+# 原 UVA 11150 是可樂瓶回收，但在這裡必須實作：
+# 給定路徑長度 L，跳躍範圍 [S, T]，以及 M 個石頭的位置。
+# 目標：從位置 0 到達 >= L，並在過程中盡可能少地踩到或移動石頭。
 
 def solve():
     input_data = sys.stdin.read().split()
@@ -16,44 +18,48 @@ def solve():
             T = int(input_data[ptr+2])
             M = int(input_data[ptr+3])
             ptr += 4
+
             stones = sorted([int(x) for x in input_data[ptr:ptr+M]])
             ptr += M
-        except: break
 
-        # 橋樑壓縮核心：S*T 的倍數可以大幅縮短距離
-        # 因為 S, T <= 10，S*T = 90 (最小公倍數) 是安全的縮減距離
-        lcm = 2520 # 1~10 的最小公倍數更保險
+            # 使用 DP 求解最少踩到石頭的次數
+            # 由於 L 可能很大 (10^9)，需要使用離散化技巧
+            # 觀察：若兩石頭間距 > S*T，則多出的部分對跳躍組合無影響
+            # 這裡簡化為 100 倍最大跳躍距離作為壓縮門檻
+            COMPRESS = S * T
 
-        new_stones = []
-        last_pos = 0
-        new_pos = 0
-        for s in stones:
-            dist = s - last_pos
-            if dist > lcm:
-                dist = dist % lcm + lcm
-            new_pos += dist
-            new_stones.append(new_pos)
-            last_pos = s
+            new_stones = [0] * (M + 1)
+            last_pos, current_pos = 0, 0
+            stone_set = set()
 
-        # 終點也要壓縮
-        final_dist = L - last_pos
-        if final_dist > lcm:
-            final_dist = final_dist % lcm + lcm
-        new_L = new_pos + final_dist
+            for i in range(M):
+                dist = stones[i] - last_pos
+                if dist > COMPRESS:
+                    current_pos += COMPRESS
+                else:
+                    current_pos += dist
+                stone_set.add(current_pos)
+                last_pos = stones[i]
 
-        stone_set = set(new_stones)
-        # DP[i] 代表跳到位置 i 最少踩到的石子數
-        dp = [float('inf')] * (new_L + T + 1)
-        dp[0] = 0
+            # 終點也需要對應壓縮
+            final_L = current_pos + min(L - last_pos, COMPRESS)
 
-        for i in range(1, new_L + T + 1):
-            for step in range(S, T + 1):
-                if i - step >= 0:
-                    dp[i] = min(dp[i], dp[i-step] + (1 if i in stone_set else 0))
+            # DP: dp[i] 代表到達位置 i 最少踩到的石頭數
+            dp = [float('inf')] * (final_L + T + 1)
+            dp[0] = 0
 
-        # 只要跳過或到達 new_L 都算過河
-        ans = min(dp[new_L:])
-        sys.stdout.write(str(ans) + "\n")
+            for i in range(1, final_L + T):
+                for step in range(S, T + 1):
+                    if i - step >= 0:
+                        is_stone = 1 if i in stone_set else 0
+                        dp[i] = min(dp[i], dp[i-step] + is_stone)
+
+            # 在 final_L 到 final_L + T 之間找最小值
+            ans = min(dp[final_L : final_L + T])
+            print(ans)
+
+        except (EOFError, IndexError):
+            break
 
 if __name__ == "__main__":
     solve()

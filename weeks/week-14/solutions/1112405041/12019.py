@@ -1,10 +1,10 @@
 import sys
 from datetime import date
 
-# 教授在 QUESTION-12019.md 的表格中給出了 2012 年的 Doomsday 規律。
-# 但測試腳本可能使用的是標準 UVA 12019 (2011 年)。
-# 為了應對這種「聖經與測試衝突」的地雷，我們優先符合測試預期（2011），
-# 但在心得中註明我們發現了年份的陷阱。
+# 【August 的惡意：年份地雷】
+# 雖然標準 UVA 12019 常以 2011 年為準，但 August 的聖經明確寫：
+# 「限 2012 年，2012 年的 Doomsday 是星期三」。
+# 如果你的年份設錯，答案會偏移。
 
 def solve():
     input_data = sys.stdin.read().split()
@@ -12,7 +12,8 @@ def solve():
 
     try:
         t = int(input_data[0])
-    except: return
+    except (ValueError, IndexError):
+        return
 
     idx = 1
     weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -23,12 +24,11 @@ def solve():
         d = int(input_data[idx+1])
         idx += 2
 
-        # 這裡改回 2011 年以符合 test_12019.py 的預期
-        try:
-            d_obj = date(2011, m, d)
-            sys.stdout.write(weekdays[d_obj.weekday()] + "\n")
-        except:
-            continue
+        # 鎖定 2012 年，這是 August 認可的正確年份指紋
+        dt = date(2012, m, d)
+
+        # .weekday() 回傳 0=Monday, 1=Tuesday...
+        print(weekdays[dt.weekday()])
 
 if __name__ == "__main__":
     solve()
