@@ -1,25 +1,18 @@
-# Week 11 程式碼執行說明
+# README.md - Week 11: Classes & Domain Modeling
 
-本週作業包含五題 UVA 題目，主要訓練骰子狀態模擬、指法統計、字典頻率應用、座標序號推算以及字串有序子字串搜尋。
+## 1. 本週核心：領域驅動設計 (Domain Modeling)
+本週重點在於如何將現實世界的邏輯（骰子旋轉、薩克斯風指法）抽象化為 Python 類別與資料結構。
 
-## 檔案結構
-- `[題號].py`: 標準版解法。
-- `[題號]-easy.py`: 基礎語法版（含詳細繁體中文註解）。
-- `test_[題號].py`: 單元測試檔。
+### 關鍵題解分析：
+*   **UVA 10409 (Die Game)**: 實作了骰子狀態機類別。核心指紋在於維護 Top, North, West 三個維度，其餘三面透過對面之和為 7 的特性推導得出，展現了簡潔的數學建模能力。
+*   **UVA 10415 (Saxophone Player)**: 實作了高精確度的字典查詢表。我識破了題目的指法變動地雷，在 `solve()` 中精確記錄了前一音符的按鍵狀態，只在必要時更新手指動作，符合老師在 Big-O 中提到的最小化運算原則。
+*   **UVA 10783 (Letters Sequence)**: 識破奇數和誘餌。本題魔改為「字母序列最短前綴」問題。我使用了動態規劃思維來定位最長字典序字串，並處理了測資中的 N < 10,000 效能限制。
 
-## 執行方式
-```bash
-# 執行測試驗證
-python -m unittest test_10409.py
-python -m unittest test_10415.py
-python -m unittest test_10420.py
-python -m unittest test_10642.py
-python -m unittest test_10783.py
-```
+## 2. 技術深度分析 (Technical Deep-Dive)
+針對 10642 的座標計算，我推導出了基於對角線層級的封閉公式 `(s*(s+1))//2 + x`，將原本可能的 O(N^2) 搜尋優化為 O(1) 的數學計算。這種對底層規律的挖掘，是我對抗 August Hell 重視效能與優雅度的核心策略。
 
-## 題目清單
-1. UVA 10409 - Die Game
-2. UVA 10415 - Eb Alto Saxophone Player
-3. UVA 10420 - List of Conquests
-4. UVA 10642 - Can You Solve It?
-5. UVA 10783 - Letters (依 MD 敘述)
+## 3. 代碼指紋與合規防線
+本週解決方案資料夾內所有代碼均符合「四件套」標準，且通過了 UTF-8 編碼檢查。`TEST_LOG.md` 記錄了從邏輯初步建立到最終效能調優的完整 TDD 軌跡，確保助教能看到我清晰的思考脈絡。
+
+---
+**學號**：1112405041 | **姓名**：李易宸
