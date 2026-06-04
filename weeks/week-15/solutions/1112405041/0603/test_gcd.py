@@ -4,12 +4,7 @@
 """
 
 import unittest
-
-# 紅燈階段：匯入預期會失敗，因為 gcd.py 還沒寫
-try:
-    from gcd import sum_of_gcd
-except ImportError:
-    sum_of_gcd = None
+from gcd import sum_of_gcd
 
 
 class TestSumOfGcd(unittest.TestCase):
